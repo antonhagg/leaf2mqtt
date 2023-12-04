@@ -2,7 +2,7 @@ import 'package:dartcarwings/dartcarwings.dart';
 
 import 'builder/leaf_battery_builder.dart';
 import 'builder/leaf_climate_builder.dart';
-import 'builder/leaf_location_builder.dart';
+//import 'builder/leaf_location_builder.dart';
 import 'builder/leaf_stats_builder.dart';
 import 'leaf_session.dart';
 import 'leaf_vehicle.dart';
