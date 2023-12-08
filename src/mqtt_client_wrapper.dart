@@ -23,7 +23,7 @@ class MqttClientWrapper {
     // Check if secure port number for mosquitto is used, if not no client certificate required
     if (mqttPort == 8883){
         /// Set secure working
-        client.secure = true;
+        _mqttClient.secure = true;
         /// Security context
         //final currDir = '${path.current}${path.separator}example${path.separator}';
         //final context = SecurityContext.defaultContext;
