@@ -1,6 +1,6 @@
-This project is not active anymore. Feel free to copy and modify anything. As of this writing, it looks like this repo is more active: https://github.com/kamiKAC/leaf2mqtt/tree/main. Thank you.
+This project is fork of https://github.com/yp87/leaf2mqtt and https://github.com/kamiKAC/leaf2mqtt Thank you.
 
-![Docker Pulls](https://img.shields.io/docker/pulls/yp87/leaf2mqtt) ![Docker Image Version (latest by date)](https://img.shields.io/docker/v/yp87/leaf2mqtt)
+![Docker Pulls](https://img.shields.io/docker/pulls/derich367/leaf2mqtt) ![Docker Image Version (latest by date)](https://img.shields.io/docker/v/derich367/leaf2mqtt)
 # leaf2mqtt
 > :warning: olderCanada and olderUSA support may break at anytime because Nissan keep changing the API key. Thank you Nissan for working against your customers.
 
@@ -44,12 +44,12 @@ Should work with multiple Leafs, but it is untested. Please open an issue with f
 ### Home Assistant add-on
 Click the icon below to add this repository to your Home Assistant instance or follow the procedure highlighted on the [Home Assistant website](https://home-assistant.io/hassio/installing_third_party_addons).
 
-[![Install leaf2mqtt add-on repo.](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fyp87%2Fleaf2mqtt)
+[![Install leaf2mqtt add-on repo.](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fderich367%2Fleaf2mqtt)
 
 ### Pre-built images
-You can use pre-built images from here: https://hub.docker.com/r/yp87/leaf2mqtt
+You can use pre-built images from here: https://hub.docker.com/r/derich367/leaf2mqtt
 
-tag example: `yp87/leaf2mqtt:latest`
+tag example: `derich367/leaf2mqtt:latest`
 
 ### Building the image
 
