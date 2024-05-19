@@ -7,7 +7,7 @@ dependencies:
   dartnissanconnect:
     git: https://github.com/derich367/dartnissanconnect
   dartcarwings:
-    git: https://github.com/Tobiaswk/dartcarwings
+    git: https://github.com/derich367/dartcarwings
   mqtt_client: ^9.6.1
   logging: ^1.0.1
 environment:
