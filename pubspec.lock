@@ -50,15 +50,15 @@ packages:
       url: "https://github.com/Tobiaswk/dartcarwings"
     source: git
     version: "1.0.0"
-  dartnissanconnect:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: ed31b5a3ee6d472aea2a1fb97dbbcf8e90ef04c7
-      url: "https://gitlab.com/sensor-freak/dartnissanconnect"
-    source: git
-    version: "1.0.4"
+ // dartnissanconnect:
+ //   dependency: "direct main"
+ //   description:
+ //     path: "."
+ //     ref: HEAD
+ //     resolved-ref: ed31b5a3ee6d472aea2a1fb97dbbcf8e90ef04c7
+ //     url: "https://gitlab.com/sensor-freak/dartnissanconnect"
+ //   source: git
+ //   version: "1.0.4"
   dartnissanconnectna:
     dependency: "direct main"
     description:
