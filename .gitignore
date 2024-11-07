@@ -8,3 +8,4 @@ build/
 
 # per-user config
 local_settings.env
+pubspec.lock
