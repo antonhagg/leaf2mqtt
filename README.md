@@ -6,7 +6,7 @@ This project is fork of https://github.com/yp87/leaf2mqtt and https://github.com
 
 > :warning: If you're not using the Leaf frequently, stop the container or drastically reduce the update frequency, or you could well end up with a flat 12V battery.
 
-This works for my Canadian made in 2018 LEAF 40kWh. It was also reported to be working on a newer than May 2019 Leaf.
+This works Nissan Leaf newer than May 2019 and Nissan Ariya.
 
 You must have a working MQTT broker on your LAN.
 
