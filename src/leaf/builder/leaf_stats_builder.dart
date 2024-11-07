@@ -44,7 +44,7 @@ class StatsInfoBuilder extends BuilderBase {
   StatsInfoBuilder withCo2ReductionKg(String co2ReductionKg) =>
     _withSpecifiedUnitInfo('co2ReductionKg', co2ReductionKg);
 
-  StatsInfoBuilder withTripsNumber(int tripsNumber) =>
+  StatsInfoBuilder withTripsNumber(int? tripsNumber) =>
     _withInfo('tripsNumber', tripsNumber);
 
   StatsInfoBuilder withKwhGained(String kWhGained) =>

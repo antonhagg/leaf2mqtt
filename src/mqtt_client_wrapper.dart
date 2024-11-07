@@ -22,17 +22,17 @@ class MqttClientWrapper {
     _mqttClient.keepAlivePeriod = 60;
   }
 
-  MqttServerClient _mqttClient;
-  String _baseTopic;
+  late MqttServerClient _mqttClient;
+  String? _baseTopic;
   final AsciiPayloadConverter _converter = AsciiPayloadConverter();
 
   final Map<String, List<PayloadReceivedhandler>> _payloadReceivedHandlers = <String, List<PayloadReceivedhandler>>{};
 
-  ConnectCallback onConnected;
+  ConnectCallback? onConnected;
 
-  DisconnectCallback onDisconnected;
+  DisconnectCallback? onDisconnected;
 
-  Future<void> connectWithRetry(String mqttUser, String mqttPassword) async {
+  Future<void> connectWithRetry(String? mqttUser, String? mqttPassword) async {
     _log.info('Connecting...');
     _mqttClient.onConnected = onConnected;
 
@@ -43,7 +43,7 @@ class MqttClientWrapper {
     bool connected = false;
     while (!connected) {
       try {
-        final MqttClientConnectionStatus connectionCode  = await _mqttClient.connect(mqttUser, mqttPassword);
+        final MqttClientConnectionStatus connectionCode  = (await _mqttClient.connect(mqttUser, mqttPassword))!;
         _log.info('Mqtt connection code: ' + connectionCode.returnCode.toString());
         connected = connectionCode.returnCode == MqttConnectReturnCode.connectionAccepted;
       } catch (e, stackTrace) {
@@ -64,7 +64,7 @@ class MqttClientWrapper {
     _log.info('Subscribing to command topics');
     _mqttClient.subscribe('$_baseTopic/command/#', MqttQos.exactlyOnce);
     _mqttClient.subscribe('$_baseTopic/+/command/#', MqttQos.exactlyOnce);
-    _mqttClient.updates.listen(_receiveData);
+    _mqttClient.updates!.listen(_receiveData);
   }
 
   void subscribeTopic(String topic, PayloadReceivedhandler handler){
@@ -75,7 +75,7 @@ class MqttClientWrapper {
       ifAbsent: () => <PayloadReceivedhandler> [handler]);
   }
 
-  void publishMessage(String topic, String value) {
+  void publishMessage(String? topic, String? value) {
     if (!(topic?.isEmpty ?? true) && !(value?.isEmpty ?? true) )
     {
       _log.finest('Publishing message $topic $value');
@@ -83,7 +83,7 @@ class MqttClientWrapper {
         _mqttClient.publishMessage(
           '$_baseTopic/$topic',
           MqttQos.atLeastOnce,
-          _converter.convertToBytes(value), retain: true);
+          _converter.convertToBytes(value!), retain: true);
       } on ConnectionException catch (_) {
         _log.finest('connection error while publishing message');
         // does not matter, we will send back latest states on reconnect.

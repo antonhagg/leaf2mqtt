@@ -11,17 +11,17 @@ import 'leaf_vehicle.dart';
 final Logger _log = Logger('NissanConnectNASessionWrapper');
 
 class NissanConnectNASessionWrapper extends LeafSessionInternal {
-  NissanConnectNASessionWrapper(this._countryCode, String username, String password)
+  NissanConnectNASessionWrapper(this._countryCode, String? username, String? password)
     : super(username, password);
 
-  NissanConnectSession _session;
+  late NissanConnectSession _session;
   final String _countryCode;
 
   @override
   Future<void> login() async {
     _session = NissanConnectSession(debug: _log.level <= Level.FINER);
     const String fakeAndroidUserAgent = 'Dalvik/2.1.0 (Linux; U; Android 5.1.1; Android SDK built for x86 Build/LMY48X)';
-    await _session.login(username: username, password: password, countryCode: _countryCode, userAgent: fakeAndroidUserAgent);
+    await _session.login(username: username!, password: password!, countryCode: _countryCode, userAgent: fakeAndroidUserAgent);
 
     final List<VehicleInternal> newVehicles = _session.vehicles.map((NissanConnectVehicle vehicle) =>
       NissanConnectNAVehicleWrapper(vehicle)).toList();
@@ -39,7 +39,7 @@ class NissanConnectNAVehicleWrapper extends VehicleInternal {
 
   NissanConnectVehicle _getVehicle() =>
     _session.vehicles.firstWhere((NissanConnectVehicle v) => v.vin.toString() == vin,
-      orElse: () => throw Exception('Could not find matching vehicle: $vin number of vehicles: ${_session.vehicles.length}'));
+      orElse: (() => throw Exception('Could not find matching vehicle: $vin number of vehicles: ${_session.vehicles.length}')) as NissanConnectVehicle Function()?);
 
   @override
   bool isFirstVehicle() => _session.vehicle.vin == vin;
@@ -94,11 +94,11 @@ class NissanConnectNAVehicleWrapper extends VehicleInternal {
   Future<Map<String, String>> fetchClimateStatus() =>
     Future<Map<String, String>>.value(
       saveAndPrependVin(ClimateInfoBuilder()
-        .withCabinTemperatureCelsius(_getVehicle().incTemperature)
+        .withCabinTemperatureCelsius(_getVehicle().incTemperature!)
         .build()));
 
   @override
-  Future<bool> startClimate(int targetTemperatureCelsius) =>
+  Future<bool> startClimate(int? targetTemperatureCelsius) =>
     _getVehicle().requestClimateControlOn(DateTime.now());
 
   @override

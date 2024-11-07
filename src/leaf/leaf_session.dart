@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:dartcarwings/dartcarwings.dart';
 import 'package:logging/logging.dart';
 
@@ -17,31 +18,25 @@ enum LeafType {
   olderJapan,
 }
 
-LeafSession createLeafSession(LeafType leafType, String username, String password) {
+LeafSession createLeafSession(LeafType? leafType, String? username, String? password) {
   switch (leafType) {
     case LeafType.newerThanMay2019:
       return NissanConnectSessionWrapper(username, password);
-      break;
 
     case LeafType.olderCanada:
       return NissanConnectNASessionWrapper('CA', username, password);
-      break;
 
     case LeafType.olderUsa:
       return NissanConnectNASessionWrapper('US', username, password);
-      break;
 
     case LeafType.olderEurope:
       return CarwingsWrapper(CarwingsRegion.Europe, username, password);
-      break;
 
     case LeafType.olderJapan:
       return CarwingsWrapper(CarwingsRegion.Japan, username, password);
-      break;
 
     case LeafType.olderAustralia:
       return CarwingsWrapper(CarwingsRegion.Australia, username, password);
-      break;
 
     default:
       throw ArgumentError.value(leafType, 'leafType', 'this LeafType is not supported yet.');
@@ -51,8 +46,8 @@ LeafSession createLeafSession(LeafType leafType, String username, String passwor
 abstract class LeafSessionInternal extends LeafSession {
   LeafSessionInternal(this.username, this.password);
 
-  final String username;
-  final String password;
+  final String? username;
+  final String? password;
 
   List<VehicleInternal> _lastKnownVehicles = <VehicleInternal>[];
 
@@ -62,8 +57,8 @@ abstract class LeafSessionInternal extends LeafSession {
   void setVehicles(List<VehicleInternal> newVehicles) {
     // keep the last states
     for (final VehicleInternal lastKnownVehicle in _lastKnownVehicles) {
-      final VehicleInternal matchingVehicle =
-        newVehicles.firstWhere((VehicleInternal vehicle) => vehicle.vin == lastKnownVehicle.vin, orElse: () => null);
+      final VehicleInternal? matchingVehicle =
+        newVehicles.firstWhereOrNull((VehicleInternal vehicle) => vehicle.vin == lastKnownVehicle.vin);
       matchingVehicle?.setLastKnownStatus(lastKnownVehicle);
     }
 
@@ -85,19 +80,19 @@ typedef ExecutableVehicleActionHandler<T> = Future<T> Function(Vehicle vehicle);
 typedef SyncExecutableVehicleActionHandler<T> = T Function(Vehicle vehicle);
 abstract class LeafSession {
 
-  ExecutionErrorCallback onExecutionError;
+  ExecutionErrorCallback? onExecutionError;
 
   List<Vehicle> get vehicles;
 
    Vehicle _getVehicle(String vin) =>
     vehicles.firstWhere((Vehicle vehicle) => vehicle.vin == vin,
-                        orElse: () => throw Exception('Vehicle $vin not found.'));
+                        orElse: (() => throw Exception('Vehicle $vin not found.')) as Vehicle Function()?);
 
   Future<void> login();
 
   Map<String, String> getAllLastKnownStatus();
 
-  T executeSync<T>(SyncExecutableVehicleActionHandler<T> executable, String vin) {
+  T? executeSync<T>(SyncExecutableVehicleActionHandler<T> executable, String vin) {
       try {
         return executable(_getVehicle(vin));
       } catch (e, stackTrace) {
@@ -120,17 +115,17 @@ abstract class LeafSession {
     }
 
     if (!anyCommandSucceeded && onExecutionError != null) {
-        onExecutionError(vin);
+        onExecutionError!(vin);
       }
   }
 
-  Future<T> executeWithRetry<T>(ExecutableVehicleActionHandler<T> executable, String vin) async {
+  Future<T?> executeWithRetry<T>(ExecutableVehicleActionHandler<T> executable, String vin) async {
     try {
       return await _executeWithRetry(executable, vin);
     } catch(e, stackTrace) {
       _logException(e, stackTrace);
       if (onExecutionError != null) {
-        onExecutionError(vin);
+        onExecutionError!(vin);
       }
     }
 

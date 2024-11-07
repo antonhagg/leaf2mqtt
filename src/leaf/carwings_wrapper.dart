@@ -8,17 +8,17 @@ import 'leaf_session.dart';
 import 'leaf_vehicle.dart';
 
 class CarwingsWrapper extends LeafSessionInternal {
-  CarwingsWrapper(this._region, String username, String password)
+  CarwingsWrapper(this._region, String? username, String? password)
     : super(username, password);
 
   final CarwingsRegion _region;
 
-  CarwingsSession _session;
+  late CarwingsSession _session;
 
   @override
   Future<void> login() async {
     _session = CarwingsSession();
-    await _session.login(username: username, password: password, region: _region);
+    await _session.login(username: username!, password: password!, region: _region);
 
     final List<VehicleInternal> newVehicles = _session.vehicles.map((CarwingsVehicle vehicle) =>
       CarwingsVehicleWrapper(vehicle)).toList();
@@ -36,14 +36,14 @@ class CarwingsVehicleWrapper extends VehicleInternal {
 
   CarwingsVehicle _getVehicle() =>
     _session.vehicles.firstWhere((CarwingsVehicle v) => v.vin.toString() == vin,
-      orElse: () => throw Exception('Could not find matching vehicle: $vin number of vehicles: ${_session.vehicles.length}'));
+      orElse: (() => throw Exception('Could not find matching vehicle: $vin number of vehicles: ${_session.vehicles.length}')) as CarwingsVehicle Function()?);
 
   @override
   bool isFirstVehicle() => _session.vehicle.vin == vin;
 
   @override
   Future<Map<String, String>> fetchDailyStatistics(DateTime targetDate) async {
-    final CarwingsStatsDaily stats = await _getVehicle().requestStatisticsDaily();
+    final CarwingsStatsDaily stats = (await _getVehicle().requestStatisticsDaily())!;
 
     if (stats.electricCostScale == 'miles/kWh') {
       return saveAndPrependVin(StatsInfoBuilder(TimeRange.Daily)
@@ -62,7 +62,7 @@ class CarwingsVehicleWrapper extends VehicleInternal {
   
   @override
   Future<Map<String, String>> fetchMonthlyStatistics(DateTime targetDate) async {
-    final CarwingsStatsMonthly stats = await _getVehicle().requestStatisticsMonthly(targetDate);
+    final CarwingsStatsMonthly stats = (await _getVehicle().requestStatisticsMonthly(targetDate))!;
 
     if (stats.mileageUnit == 'km') {
       return saveAndPrependVin(StatsInfoBuilder(TimeRange.Monthly)
@@ -96,7 +96,7 @@ class CarwingsVehicleWrapper extends VehicleInternal {
 
   @override
   Future<Map<String, String>> fetchBatteryStatus() async {
-    final CarwingsBattery battery = await _getVehicle().requestBatteryStatusLatest();
+    final CarwingsBattery battery = (await _getVehicle().requestBatteryStatusLatest())!;
 
     return saveAndPrependVin(BatteryInfoBuilder()
             .withChargePercentage(((battery.batteryLevel * 100) / battery.batteryLevelCapacity).round())
@@ -122,8 +122,8 @@ class CarwingsVehicleWrapper extends VehicleInternal {
 
   @override
   Future<Map<String, String>> fetchClimateStatus() async {
-    final CarwingsCabinTemperature cabinTemperature = await _getVehicle().requestCabinTemperature();
-    final CarwingsHVAC hvac = await _getVehicle().requestHVACStatus();
+    final CarwingsCabinTemperature cabinTemperature = (await _getVehicle().requestCabinTemperature())!;
+    final CarwingsHVAC hvac = (await _getVehicle().requestHVACStatus())!;
 
     return saveAndPrependVin(ClimateInfoBuilder()
             .withCabinTemperatureCelsius(cabinTemperature.temperature)
@@ -132,7 +132,7 @@ class CarwingsVehicleWrapper extends VehicleInternal {
   }
 
   @override
-  Future<bool> startClimate(int targetTemperatureCelsius) async {
+  Future<bool> startClimate(int? targetTemperatureCelsius) async {
       await _getVehicle().requestClimateControlOn();
       return true;
   }
@@ -145,7 +145,7 @@ class CarwingsVehicleWrapper extends VehicleInternal {
 
   @override
   Future<Map<String, String>> fetchLocation() async {
-    final CarwingsLocation location = await _getVehicle().requestLocation();
+    final CarwingsLocation location = (await _getVehicle().requestLocation())!;
     return saveAndPrependVin(LocationInfoBuilder()
       .withLatitude(location.latitude)
       .withLongitude(location.longitude)

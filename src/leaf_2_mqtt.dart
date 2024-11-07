@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:logging/logging.dart';
 
 import 'leaf/leaf_session.dart';
 import 'leaf/leaf_vehicle.dart';
 import 'mqtt_client_wrapper.dart';
 
-LeafSession _session;
+late LeafSession _session;
 int _commandAttempts = 2;
 final Logger _log = Logger('main');
 
@@ -15,10 +16,9 @@ Future<void> main() async {
   final Map<String, String> envVars = Platform.environment;
 
   final String logLevelStr = envVars['LOG_LEVEL'] ?? '${Level.WARNING}';
-  Level logLevel =
-    Level.LEVELS.firstWhere(
-      (Level level) => level.name.toLowerCase() == logLevelStr.toLowerCase(),
-      orElse: () => null);
+  Level? logLevel =
+    Level.LEVELS.firstWhereOrNull(
+      (Level level) => level.name.toLowerCase() == logLevelStr.toLowerCase());
 
   if (logLevel == null) {
     print('LOG_LEVEL environment variable should be set to a valid value from: ${Level.LEVELS}. Defaulting to Warning.');
@@ -32,8 +32,8 @@ Future<void> main() async {
 
   _log.info('V0.11');
 
-  final String leafUser = envVars['LEAF_USERNAME'];
-  final String leafPassword = envVars['LEAF_PASSWORD'];
+  final String? leafUser = envVars['LEAF_USERNAME'];
+  final String? leafPassword = envVars['LEAF_PASSWORD'];
 
   if ((leafUser?.isEmpty ?? true) || (leafPassword?.isEmpty ?? true)) {
     _log.severe('LEAF_USERNAME and LEAF_PASSWORD environment variables must be set.');
@@ -41,10 +41,9 @@ Future<void> main() async {
   }
 
   final String leafTypeStr = envVars['LEAF_TYPE'] ?? 'oldUSA';
-  final LeafType leafType =
-    LeafType.values.firstWhere(
-      (LeafType e) => e.toString().toLowerCase().endsWith(leafTypeStr.toLowerCase()),
-      orElse: () => null);
+  final LeafType? leafType =
+    LeafType.values.firstWhereOrNull(
+      (LeafType e) => e.toString().toLowerCase().endsWith(leafTypeStr.toLowerCase()));
 
   if (leafType == null) {
     final String leafTypes = LeafType.values.toString();
@@ -69,12 +68,12 @@ Future<void> main() async {
   await Future.wait(_session.vehicles.map((Vehicle vehicle) => startUpdateLoop(mqttClient, vehicle.vin)));
 }
 
-Completer<void> _loginCompleter;
+Completer<void>? _loginCompleter;
 Future<void> _login(MqttClientWrapper mqttClient) async {
   if (_loginCompleter != null) {
     _log.fine('Already logging in, waiting...');
     // already logging in.. wait for it to complete.
-    await _loginCompleter.future;
+    await _loginCompleter!.future;
     return;
   }
 
@@ -87,7 +86,7 @@ Future<void> _login(MqttClientWrapper mqttClient) async {
       await _session.login();
       _log.info('Login successful');
       loggedIn = true;
-      _loginCompleter.complete();
+      _loginCompleter!.complete();
       _loginCompleter = null;
     } catch (e, stacktrace) {
       _log.warning('An error occured while logging in. Please make sure you have selected the right LEAF_TYPE, LEAF_USERNAME and LEAF_PASSWORD. Retrying in 5 seconds.');
@@ -166,8 +165,8 @@ void subscribeToCommands(MqttClientWrapper mqttClient, String vin) {
               (_) => fetchAndPublishClimateStatus(mqttClient, vin)));
         break;
       default:
-        if (payload?.startsWith('start') ?? false) {
-          int targetTemperatureCelsius;
+        if (payload.startsWith('start')) {
+          int? targetTemperatureCelsius;
 
           String targetTemperature = payload.replaceFirst('start', '').trim();
           if (targetTemperature.startsWith('c')) {
@@ -176,7 +175,7 @@ void subscribeToCommands(MqttClientWrapper mqttClient, String vin) {
 
           } else if (targetTemperature.startsWith('f')) {
             targetTemperature = targetTemperature.replaceFirst('f', '').trim();
-            final int targetTemperatureFahrenheit = double.tryParse(targetTemperature)?.round();
+            final int? targetTemperatureFahrenheit = double.tryParse(targetTemperature)?.round();
 
             if (targetTemperatureFahrenheit != null) {
               targetTemperatureCelsius = ((targetTemperatureFahrenheit - 32) * 5 / 9).round();
@@ -285,7 +284,7 @@ void _onConnected(MqttClientWrapper mqttClient) {
   mqttClient.publishStates(_session.getAllLastKnownStatus());
 }
 
-void _onExecutionError(MqttClientWrapper mqttClient, [String vin]) {
+void _onExecutionError(MqttClientWrapper mqttClient, [String? vin]) {
   _log.warning('Could not execute request.');
   final String errorDateTime = DateTime.now().toUtc().toIso8601String();
   mqttClient.publishMessage('lastErrorDateTimeUtc', errorDateTime);
@@ -295,7 +294,7 @@ void _onExecutionError(MqttClientWrapper mqttClient, [String vin]) {
 }
 
 extension on MqttClientWrapper {
-  void publishStates(Map<String, String> states) {
+  void publishStates(Map<String, String?>? states) {
     if (states != null) {
       _log.finest('publishStates ${states.toString()}');
       states.forEach(publishMessage);

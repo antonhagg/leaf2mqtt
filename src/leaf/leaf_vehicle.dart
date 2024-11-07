@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:collection/collection.dart' show IterableExtension;
 
 abstract class VehicleInternal extends Vehicle {
   VehicleInternal(String nickname, String vin) : super(vin) {
@@ -43,17 +44,17 @@ abstract class Vehicle {
   bool get isCharging =>
     _findValueOfKeyIn(_lastKnownStatus, 'charging') == 'true';
 
-  String _findValueOfKeyIn(Map<String, String> status, String key) {
-    return status.entries.firstWhere(
+  String? _findValueOfKeyIn(Map<String, String> status, String key) {
+    return status.entries.firstWhereOrNull(
              (MapEntry<String, String> status) =>
-               status.key.endsWith(key), orElse: () => null)?.value;
+               status.key.endsWith(key))?.value;
   }
 
   final Map<String, String> _lastKnownStatus = <String, String>{};
   Map<String, String> getLastKnownStatus();
 
-  Map<String, String> getVehicleStatus() {
-    final Map<String, String> info = <String, String>{
+  Map<String, String?> getVehicleStatus() {
+    final Map<String, String?> info = <String, String?>{
       'nickname': _lastKnownStatus['nickname'],
       'vin': _lastKnownStatus['vin'],
     };
@@ -69,7 +70,7 @@ abstract class Vehicle {
   Future<bool> startCharging();
 
   Future<Map<String, String>> fetchClimateStatus();
-  Future<bool> startClimate(int targetTemperatureCelsius);
+  Future<bool> startClimate(int? targetTemperatureCelsius);
   Future<bool> stopClimate();
 
   Future<Map<String, String>> fetchLocation();

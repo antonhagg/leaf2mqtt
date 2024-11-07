@@ -10,15 +10,15 @@ import 'leaf_session.dart';
 import 'leaf_vehicle.dart';
 
 class NissanConnectSessionWrapper extends LeafSessionInternal {
-  NissanConnectSessionWrapper(String username, String password)
+  NissanConnectSessionWrapper(String? username, String? password)
     : super(username, password);
 
-  NissanConnectSession _session;
+  late NissanConnectSession _session;
 
   @override
   Future<void> login() async {
     _session = NissanConnectSession();
-    await _session.login(username: username, password: password);
+    await _session.login(username: username!, password: password!);
 
     final List<VehicleInternal> newVvehicles = _session.vehicles.map((NissanConnectVehicle vehicle) =>
       NissanConnectVehicleWrapper(vehicle)).toList();
@@ -36,7 +36,7 @@ class NissanConnectVehicleWrapper extends VehicleInternal {
 
   NissanConnectVehicle _getVehicle() =>
     _session.vehicles.firstWhere((NissanConnectVehicle v) => v.vin.toString() == vin,
-      orElse: () => throw Exception('Could not find matching vehicle: $vin number of vehicles: ${_session.vehicles.length}'));
+      orElse: (() => throw Exception('Could not find matching vehicle: $vin number of vehicles: ${_session.vehicles.length}')) as NissanConnectVehicle Function()?);
 
   @override
   bool isFirstVehicle() => _session.vehicle.vin == vin;
@@ -68,7 +68,7 @@ class NissanConnectVehicleWrapper extends VehicleInternal {
   Future<Map<String, String>> fetchBatteryStatus() async {
     final NissanConnectBattery battery = await _getVehicle().requestBatteryStatus();
 
-    final int percentage =
+    final int? percentage =
       double.tryParse(battery.batteryPercentage.replaceFirst('%', ''))?.round();
 
     return saveAndPrependVin(BatteryInfoBuilder()
@@ -105,10 +105,10 @@ class NissanConnectVehicleWrapper extends VehicleInternal {
   }
 
   @override
-  Future<bool> startClimate(int targetTemperatureCelsius) =>
+  Future<bool> startClimate(int? targetTemperatureCelsius) =>
     _getVehicle().requestClimateControlOn(
       DateTime.now(),
-      targetTemperatureCelsius);
+      targetTemperatureCelsius!);
 
   @override
   Future<bool> stopClimate() =>
