@@ -87,6 +87,11 @@ class NissanConnectNAVehicleWrapper extends VehicleInternal {
   }
 
   @override
+  Future<bool> refreshBatteryStatus() async {
+    return true;
+  }
+
+  @override
   Future<bool> startCharging() =>
     _getVehicle().requestChargingStart();
 

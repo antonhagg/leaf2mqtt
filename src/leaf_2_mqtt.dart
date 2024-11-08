@@ -143,7 +143,8 @@ void subscribeToCommands(MqttClientWrapper mqttClient, String vin) {
   subscribe('command/battery', (String payload) {
       switch (payload) {
         case 'update':
-            fetchAndPublishBatteryStatus(mqttClient, vin);
+            refreshBatteryStatus(mqttClient, vin).then((_) =>
+            fetchAndPublishBatteryStatus(mqttClient, vin));
           break;
         case 'startcharging':
             _session.executeCommandWithRetry((Vehicle vehicle) => vehicle.startCharging(), vin, _commandAttempts).then(
@@ -246,6 +247,12 @@ Future<void> fetchAndPublishBatteryStatus(MqttClientWrapper mqttClient, String v
   _log.finer('fetchAndPublishBatteryStatus for $vin');
   return _session.executeWithRetry((Vehicle vehicle) =>
            vehicle.fetchBatteryStatus(), vin).then(mqttClient.publishStates);
+}
+
+Future<void> refreshBatteryStatus(MqttClientWrapper mqttClient, String vin) {
+  _log.finer('refreshBatteryStatus for $vin');
+  return _session.executeWithRetry((Vehicle vehicle) =>
+           vehicle.refreshBatteryStatus(), vin);
 }
 
 Future<void> fetchAndPublishClimateStatus(MqttClientWrapper mqttClient, String vin) {

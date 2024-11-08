@@ -114,6 +114,11 @@ class CarwingsVehicleWrapper extends VehicleInternal {
             .build());
   }
 
+    @override
+  Future<bool> refreshBatteryStatus() async {
+    return await _getVehicle().requestBatteryStatus() != null;
+  }
+
   @override
   Future<bool> startCharging() async {
     await _getVehicle().requestChargingStart(DateTime.now());
