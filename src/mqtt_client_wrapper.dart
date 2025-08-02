@@ -20,6 +20,18 @@ class MqttClientWrapper {
     _log.info('Creating MQTT client with $mqttHost:$mqttPort listening on $_baseTopic.');
     _mqttClient = MqttServerClient.withPort(mqttHost, 'leaf2mqtt', mqttPort);
     _mqttClient.keepAlivePeriod = 60;
+    // Check if secure port number for mosquitto is used, if not no client certificate required
+    if (mqttPort == 8883){
+        /// Set secure working
+        _mqttClient.secure = true;
+        /// Security context
+        //final currDir = '${path.current}${path.separator}example${path.separator}';
+        //final context = SecurityContext.defaultContext;
+        // Note if you get a 'TlsException: Failure trusting builtin roots (OS Error:
+        // 	CERT_ALREADY_IN_HASH_TABLE' error here comment out the following 2 lines
+        //context
+        //.setTrustedCertificates(currDir + path.join('pem', 'mosquitto.org.crt'));
+      }
   }
 
   late MqttServerClient _mqttClient;
