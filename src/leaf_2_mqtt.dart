@@ -212,14 +212,14 @@ void subscribeToCommands(MqttClientWrapper mqttClient, String vin) {
     }
   });
 
-  subscribe('command/location', (String payload) {
-      switch (payload) {
-        case 'update':
-            fetchAndPublishLocation(mqttClient, vin);
-          break;
-        default:
-      }
-    });
+  //subscribe('command/location', (String payload) {
+  //    switch (payload) {
+  //      case 'update':
+  //          fetchAndPublishLocation(mqttClient, vin);
+  //        break;
+  //      default:
+  //    }
+  //  });
 
   subscribe('command/cockpitStatus', (String payload) {
     switch (payload) {
@@ -261,11 +261,11 @@ Future<void> fetchAndPublishClimateStatus(MqttClientWrapper mqttClient, String v
            vehicle.fetchClimateStatus(), vin).then(mqttClient.publishStates);
 }
 
-Future<void> fetchAndPublishLocation(MqttClientWrapper mqttClient, String vin) {
-  _log.finer('fetchAndPublishLocation for $vin');
-  return _session.executeWithRetry((Vehicle vehicle) =>
-           vehicle.fetchLocation(), vin).then(mqttClient.publishStates);
-}
+//Future<void> fetchAndPublishLocation(MqttClientWrapper mqttClient, String vin) {
+//  _log.finer('fetchAndPublishLocation for $vin');
+//  return _session.executeWithRetry((Vehicle vehicle) =>
+//           vehicle.fetchLocation(), vin).then(mqttClient.publishStates);
+//}
 
 Future<void> fetchAndPublishCockpitStatus(MqttClientWrapper mqttClient, String vin) {
   _log.finer('fetchAndPublishCockpit for $vin');
@@ -280,7 +280,7 @@ Future<void> fetchAndPublishAllStatus(MqttClientWrapper mqttClient, String vin) 
       _session.executeSync((Vehicle vehicle) => vehicle.getVehicleStatus(), vin))),
     fetchAndPublishBatteryStatus(mqttClient, vin),
     fetchAndPublishClimateStatus(mqttClient, vin),
-    fetchAndPublishLocation(mqttClient, vin),
+  //  fetchAndPublishLocation(mqttClient, vin),
     fetchAndPublishCockpitStatus(mqttClient, vin)
   ]);
 }
