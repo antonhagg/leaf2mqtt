@@ -74,7 +74,7 @@ abstract class Vehicle {
   Future<bool> startClimate(int? targetTemperatureCelsius);
   Future<bool> stopClimate();
 
-  Future<Map<String, String>> fetchLocation();
+  //Future<Map<String, String>> fetchLocation();
   Future<Map<String, String>> fetchCockpitStatus();
 }
 
